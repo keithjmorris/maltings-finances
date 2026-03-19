@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Maltings Wells – Financial Information</title>
+
+  <!--
+    Chart.js — a free charting library loaded from a CDN.
+    Like adding a Swift Package dependency, but no installation needed.
+    The browser downloads it automatically when the page loads.
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+
+  <style>
+    :root {
+      --blue:      #2979FF;
+      --blue-dark: #1a56cc;
+      --white:     #ffffff;
+      --bg:        #f0f4ff;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+    }
+
+    .header {
+      text-align: center;
+      padding: 24px 16px 16px;
+    }
+    .header h2 { font-size: 28px; font-style: italic; font-weight: 700; }
+    .header h2 span { color: var(--blue); }
+    .header h1 { font-size: 20px; font-weight: 400; color: #333; margin-top: 4px; }
+
+    /* ── LIST VIEW ── */
+    #list-view {
+      padding: 0 16px 32px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    #loading-message { text-align: center; color: #666; padding: 32px; }
+    .list-card { background: var(--blue); border-radius: 14px; overflow: hidden; }
+    .list-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 18px;
+      color: var(--white);
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.15);
+    }
+    .list-row:last-child { border-bottom: none; }
+    .list-row:hover { background: var(--blue-dark); }
+    .list-row .chevron { font-size: 14px; opacity: 0.7; }
+
+    /* ── DETAIL VIEW ── */
+    #detail-view {
+      display: none;
+      padding: 0 16px 32px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .back-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--blue);
+      font-size: 16px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      padding: 8px 0;
+      background: none;
+      border: none;
+    }
+
+    .detail-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #222;
+      margin-bottom: 12px;
+    }
+
+    .section-card {
+      background: var(--blue);
+      border-radius: 14px;
+      margin-bottom: 12px;
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 320px;
+    }
+
+    .section-heading {
+      padding: 12px 14px 6px;
+      color: var(--white);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    th, td {
+      padding: 6px 10px;
+      color: var(--white);
+      font-size: 14px;
+      white-space: nowrap;
+    }
+
+    th {
+      font-weight: 600;
+      font-size: 13px;
+      opacity: 0.75;
+      text-align: right;
+      padding-bottom: 4px;
+    }
+
+    th:first-child, td:first-child { text-align: left; opacity: 1; }
+    td:not(:first-child) { text-align: right; font-variant-numeric: tabular-nums; }
+    tr.data-row + tr.data-row td { border-top: 1px solid rgba(255,255,255,0.12); }
+
+    .notes-card {
+      background: var(--blue);
+      border-radius: 14px;
+      padding: 14px 16px;
+      color: var(--white);
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .notes-card .notes-label { font-weight: 700; margin-bottom: 4px; }
+    .notes-card .notes-text { opacity: 0.85; }
+
+    /* ── CHART BUTTONS ── */
+    /*
+      Row of buttons at the bottom of the detail screen,
+      like the tab bar at the bottom of your iOS app.
+    */
+    .chart-buttons {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap; /* wraps onto two lines on very narrow screens */
+    }
+
+    .chart-btn {
+      flex: 1;               /* each button shares available width equally */
+      min-width: 120px;
+      padding: 12px 8px;
+      background: var(--blue);
+      color: var(--white);
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .chart-btn:hover { background: var(--blue-dark); }
+
+    /*
+      Active state — the currently selected chart button.
+      Like a selected tab in a TabView.
+    */
+    .chart-btn.active {
+      background: var(--blue-dark);
+      outline: 2px solid white;
+    }
+
+    /* ── CHART VIEW ── */
+    /*
+      This screen shows when a chart button is tapped.
+      Hidden by default, shown by JavaScript.
+    */
+    #chart-view {
+      display: none;
+      padding: 0 16px 32px;
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .chart-card {
+      background: var(--blue);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 12px;
+    }
+
+    .chart-title {
+      color: var(--white);
+      font-size: 16px;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    /*
+      The <canvas> element is what Chart.js draws onto.
+      Like a Canvas view in SwiftUI.
+      max-width and margin:auto centres it.
+    */
+    .chart-canvas-wrapper {
+      max-width: 340px;
+      margin: 0 auto;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+    <h2>Maltings<span>wells</span></h2>
+    <h1>Financial information</h1>
+  </div>
+
+  <!-- SCREEN 1: LIST -->
+  <div id="list-view">
+    <div id="loading-message">Loading…</div>
+    <div class="list-card" id="list-card" style="display:none;"></div>
+  </div>
+
+  <!-- SCREEN 2: DETAIL -->
+  <div id="detail-view">
+    <button class="back-button" onclick="showList()">‹ &nbsp;Back</button>
+    <div class="detail-title" id="detail-title"></div>
+    <div id="detail-content"></div>
+  </div>
+
+  <!-- SCREEN 3: CHART -->
+  <div id="chart-view">
+    <button class="back-button" onclick="showDetailFromChart()">‹ &nbsp;Back</button>
+    <div class="detail-title" id="chart-month-title"></div>
+    <div class="chart-card">
+      <div class="chart-title" id="chart-title"></div>
+      <div class="chart-canvas-wrapper">
+        <!--
+          <canvas> is the drawing surface Chart.js uses.
+          We give it an id so JavaScript can find it.
+        -->
+        <canvas id="myChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+
+    const BIN_URL = 'https://api.jsonbin.io/v3/b/66715331acd3cb34a859295b';
+    let allMonths = [];
+    let currentMonth = null;  // tracks which month is being viewed
+    let currentChart = null;  // tracks the Chart.js instance so we can destroy it before redrawing
+
+    async function loadData() {
+      try {
+        const response = await fetch(BIN_URL);
+        const json = await response.json();
+        const rawMonths = json.record;
+        const seen = new Set();
+        allMonths = rawMonths.filter(month => {
+          if (seen.has(month.id)) return false;
+          seen.add(month.id);
+          return true;
+        });
+        buildList();
+      } catch (error) {
+        document.getElementById('loading-message').textContent =
+          'Could not load data. Please check your connection.';
+      }
+    }
+
+    function buildList() {
+      const card = document.getElementById('list-card');
+      allMonths.forEach(month => {
+        const label = month.year ? `${month.month} ${month.year}` : month.month;
+        const row = document.createElement('div');
+        row.className = 'list-row';
+        row.innerHTML = `<span>${label}</span><span class="chevron">›</span>`;
+        row.onclick = () => showDetail(month.id);
+        card.appendChild(row);
+      });
+      document.getElementById('loading-message').style.display = 'none';
+      card.style.display = 'block';
+    }
+
+    const SECTIONS = [
+      {
+        title: 'Summary',
+        rows: [
+          { label: 'Variable income',       actual: 'variableIncomeActual',    plan: 'variableIncomePlan',    last: 'variableIncomeLast' },
+          { label: 'Other income',          actual: 'otherIncomeActual',       plan: 'otherIncomePlan',       last: 'otherIncomeLast' },
+          { label: 'Variable costs',        actual: 'variableCostsActual',     plan: 'variableCostsPlan',     last: 'variableCostsLast' },
+          { label: 'Gross profit',          actual: 'grossProfitActual',       plan: 'grossProfitPlan',       last: 'grossProfitLast' },
+          { label: 'Fixed costs',           actual: 'fixedCostsActual',        plan: 'fixedCostsPlan',        last: 'fixedCostsLast' },
+          { label: 'Operating profit/loss', actual: 'operatingResultActual',   plan: 'operatingResultPlan',   last: 'operatingResultLast' },
+          { label: 'Fundraising income',    actual: 'fundraisingNetActual',    plan: 'fundraisingNetPlan',    last: 'fundraisingNetLast' },
+          { label: 'Final profit/loss',     actual: 'resultActual',            plan: 'resultPlan',            last: 'resultLast' },
+        ]
+      },
+      {
+        title: 'Cafe / Bar',
+        rows: [
+          { label: 'Cafe bar revenue', actual: 'cafeBarActual',    plan: 'cafeBarPlan',    last: 'cafeBarLast' },
+          { label: 'Cafe bar margin',  actual: 'cafeMarginActual', plan: 'cafeMarginPlan', last: 'cafeMarginLast' },
+        ]
+      },
+      {
+        title: 'Performance',
+        rows: [
+          { label: 'Performance revenue', actual: 'performanceActual',       plan: 'performancePlan',       last: 'performanceLast' },
+          { label: 'Performance margin',  actual: 'performanceMarginActual', plan: 'performanceMarginPlan', last: 'performanceMarginLast' },
+        ]
+      },
+      {
+        title: 'Fundraising',
+        rows: [
+          { label: 'Friends & Patrons',    actual: 'fundraisingFAndPActual',          plan: 'fundraisingFAndPPlan',          last: 'fundraisingFAndPLast' },
+          { label: 'Trusts & Foundations', actual: 'fundraisingTrustsActual',         plan: 'fundraisingTrustsPlan',         last: 'fundraisingTrustsLast' },
+          { label: 'Large donations',      actual: 'fundraisingLargeDonationsActual', plan: 'fundraisingLargeDonationsPlan', last: 'fundraisingLargeDonationsLast' },
+        ]
+      }
+    ];
+
+    function fmt(value) {
+      return new Intl.NumberFormat('en-GB').format(Math.abs(value));
+    }
+
+    function fmtCell(value) {
+      if (value < 0) return `(${fmt(value)})`;
+      return fmt(value);
+    }
+
+    function buildSectionCard(section, month) {
+      const rowsHTML = section.rows.map(row => {
+        const actual = month[row.actual] ?? 0;
+        const plan   = month[row.plan]   ?? 0;
+        const last   = month[row.last]   ?? 0;
+        return `
+          <tr class="data-row">
+            <td>${row.label}</td>
+            <td>${fmtCell(actual)}</td>
+            <td>${fmtCell(plan)}</td>
+            <td>${fmtCell(last)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      return `
+        <div class="section-card">
+          <div class="section-heading">${section.title}</div>
+          <table>
+            <thead>
+              <tr>
+                <th></th><th>Actual</th><th>Plan</th><th>Last</th>
+              </tr>
+            </thead>
+            <tbody>${rowsHTML}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    /*
+      Decide whether to show chart buttons for this month.
+      Hide them if all actuals are zero (e.g. Full year plan).
+    */
+    function hasActuals(month) {
+      return month.variableIncomeActual !== 0 || month.cafeBarActual !== 0;
+    }
+
+    function showDetail(monthId) {
+      const month = allMonths.find(m => m.id === monthId);
+      if (!month) return;
+      currentMonth = month;
+
+      const label = month.year ? `${month.month} ${month.year}` : month.month;
+      const sectionsHTML = SECTIONS.map(s => buildSectionCard(s, month)).join('');
+      const notesHTML = month.notes ? `
+        <div class="notes-card">
+          <div class="notes-label">Notes</div>
+          <div class="notes-text">${month.notes}</div>
+        </div>
+      ` : '';
+
+      /*
+        Only show chart buttons if this month has actual data.
+        Like conditionally showing a view in SwiftUI with an if statement.
+      */
+      const chartButtonsHTML = hasActuals(month) ? `
+        <div class="chart-buttons">
+          <button class="chart-btn" onclick="showChart('income')">Income pie chart</button>
+          <button class="chart-btn" onclick="showChart('margin')">Margin pie chart</button>
+        </div>
+      ` : '';
+
+      document.getElementById('detail-content').innerHTML =
+        sectionsHTML + notesHTML + chartButtonsHTML;
+
+      document.getElementById('list-view').style.display = 'none';
+      document.getElementById('chart-view').style.display = 'none';
+      document.getElementById('detail-view').style.display = 'block';
+      document.getElementById('detail-title').textContent = label;
+      window.scrollTo(0, 0);
+    }
+
+    /* ── CHART FUNCTIONS ─────────────────────────────────────────────────
+
+       Chart.js works by:
+       1. Finding a <canvas> element
+       2. Creating a new Chart() with a type ('pie'), data, and options
+       
+       The data object needs:
+         labels: ['Slice 1', 'Slice 2', ...]   — the legend labels
+         datasets: [{ data: [100, 200, ...], backgroundColor: [...] }]
+       
+       This is similar to providing data to a SwiftUI Chart { }.
+    */
+
+    /*
+      Colours for the pie slices.
+      Using distinct shades of blue/teal/green to stay on-brand
+      while being clearly distinguishable from each other.
+    */
+    const CHART_COLOURS = [
+      '#2979FF',  // blue          — Cafe Bar
+      '#FF6D00',  // orange        — Performance
+      '#2EC4B6',  // teal          — Other variable
+      '#FFD166',  // yellow        — Other income
+      '#8338EC',  // purple        — Fundraising
+    ];
+
+    function showChart(type) {
+      const month = currentMonth;
+      if (!month) return;
+
+      const label = month.year ? `${month.month} ${month.year}` : month.month;
+
+      let chartData, chartTitle;
+
+      if (type === 'income') {
+        /*
+          Income pie chart — 5 slices:
+          1. Cafe Bar revenue
+          2. Performance revenue
+          3. Other variable income (variable income minus cafe bar minus performance)
+          4. Other income
+          5. Fundraising net
+        */
+        const otherVariable = month.variableIncomeActual
+                            - month.cafeBarActual
+                            - month.performanceActual;
+
+        chartTitle = 'Income';
+        chartData = {
+          labels: [
+            'Cafe Bar',
+            'Performance',
+            'Other variable income',
+            'Other income',
+            'Fundraising'
+          ],
+          values: [
+            month.cafeBarActual,
+            month.performanceActual,
+            otherVariable,
+            month.otherIncomeActual,
+            month.fundraisingNetActual,
+          ]
+        };
+
+      } else {
+        /*
+          Margin pie chart — 5 slices:
+          1. Cafe Bar margin (pre-calculated in JSON)
+          2. Performance margin (pre-calculated in JSON)
+          3. Other variable margin (other variable income minus other variable costs)
+             Other variable costs = total variable costs minus cafe margin minus performance margin
+          4. Other income (no associated costs)
+          5. Fundraising net (no associated costs)
+        */
+        const otherVariableIncome = month.variableIncomeActual
+                                  - month.cafeBarActual
+                                  - month.performanceActual;
+
+        const otherVariableCosts  = month.variableCostsActual
+                                  - month.cafeMarginActual   // subtract cafe contribution
+                                  - month.performanceMarginActual; // subtract performance contribution
+
+        /*
+          Wait — variable costs already excludes margins, so let's be precise:
+          The cafe bar and performance margins are (revenue - costs) for each.
+          The remaining variable costs are total variable costs minus
+          the costs attributable to cafe bar and performance.
+
+          Cafe bar costs = cafeBarActual - cafeMarginActual
+          Performance costs = performanceActual - performanceMarginActual
+          Other variable costs = variableCostsActual
+                               - (cafeBarActual - cafeMarginActual)
+                               - (performanceActual - performanceMarginActual)
+        */
+        const cafeBarCosts        = month.cafeBarActual - month.cafeMarginActual;
+        const performanceCosts    = month.performanceActual - month.performanceMarginActual;
+        const otherVarCosts       = month.variableCostsActual - cafeBarCosts - performanceCosts;
+        const otherVariableMargin = otherVariableIncome - otherVarCosts;
+
+        chartTitle = 'Margin';
+        chartData = {
+          labels: [
+            'Cafe Bar margin',
+            'Performance margin',
+            'Other variable margin',
+            'Other income',
+            'Fundraising'
+          ],
+          values: [
+            month.cafeMarginActual,
+            month.performanceMarginActual,
+            otherVariableMargin,
+            month.otherIncomeActual,
+            month.fundraisingNetActual,
+          ]
+        };
+      }
+
+      /*
+        Filter out any slices with zero or negative values —
+        pie charts don't handle these well visually.
+        We zip labels, values and colours together, filter, then unzip.
+      */
+      const slices = chartData.labels
+        .map((label, i) => ({
+          label,
+          value: chartData.values[i],
+          colour: CHART_COLOURS[i]
+        }))
+        .filter(slice => slice.value > 0);
+
+      /*
+        If an existing chart is on screen, destroy it before drawing a new one.
+        Chart.js requires this — like removing a view before adding a new one.
+      */
+      if (currentChart) {
+        currentChart.destroy();
+        currentChart = null;
+      }
+
+      // Switch to chart screen
+      document.getElementById('detail-view').style.display = 'none';
+      document.getElementById('chart-view').style.display = 'block';
+      document.getElementById('chart-month-title').textContent = label;
+      document.getElementById('chart-title').textContent = chartTitle;
+
+      /*
+        Create the Chart.js pie chart.
+        new Chart(canvasElement, config) — the config object defines
+        the type, data, and display options.
+      */
+      const ctx = document.getElementById('myChart');
+      currentChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: slices.map(s => s.label),
+          datasets: [{
+            data: slices.map(s => s.value),
+            backgroundColor: slices.map(s => s.colour),
+            borderColor: '#1a56cc',
+            borderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                color: 'white',
+                padding: 16,
+                font: { size: 13 }
+              }
+            },
+            /*
+              Tooltip — shown when hovering/tapping a slice.
+              We format the value with commas and show a percentage.
+            */
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  const value = context.parsed;
+                  const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                  const pct   = ((value / total) * 100).toFixed(1);
+                  const formatted = new Intl.NumberFormat('en-GB').format(value);
+                  return ` ${formatted} (${pct}%)`;
+                }
+              }
+            }
+          }
+        }
+      });
+
+      window.scrollTo(0, 0);
+    }
+
+    // Go back from chart to detail screen
+    function showDetailFromChart() {
+      document.getElementById('chart-view').style.display = 'none';
+      document.getElementById('detail-view').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    function showList() {
+      document.getElementById('detail-view').style.display = 'none';
+      document.getElementById('list-view').style.display = 'block';
+      window.scrollTo(0, 0);
+    }
+
+    loadData();
+
+  </script>
+
+</body>
+</html>
