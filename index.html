@@ -261,7 +261,7 @@
       try {
         const response = await fetch(BIN_URL);
         const json = await response.json();
-        const rawMonths = json.record;
+        const rawMonths = json;
         const seen = new Set();
         allMonths = rawMonths.filter(month => {
           if (seen.has(month.id)) return false;
