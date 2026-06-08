@@ -516,7 +516,16 @@
     </div>
     <div id="add-user-form" style="display:none;" class="card">
       <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New User</h3>
+      <!--
+        The UID must match the Firebase Authentication User UID exactly.
+        Find it in Firebase Console → Authentication → click the user → copy User UID.
+        This is used as the Firestore document ID so the app can look up the user's role on login.
+      -->
+      <div class="form-row-full" style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:12px;margin-bottom:14px;">
+        <p style="font-size:13px;color:#854d0e;">⚠ The Firebase UID must be copied exactly from Firebase Console → Authentication → click the user → User UID.</p>
+      </div>
       <div class="form-row">
+        <div style="grid-column:1/-1;"><label>Firebase Auth UID *</label><input type="text" id="new-user-uid" placeholder="e.g. dHbM7nwQj1h8CPQ54Df6h7..."></div>
         <div><label>First Name</label><input type="text" id="new-user-firstname"></div>
         <div><label>Last Name</label><input type="text" id="new-user-lastname"></div>
         <div><label>Email</label><input type="email" id="new-user-email"></div>
@@ -1229,15 +1238,23 @@
   });
 
   document.getElementById('save-user-btn').addEventListener('click', async () => {
+    const uid   = document.getElementById('new-user-uid').value.trim();
     const email = document.getElementById('new-user-email').value.trim();
     const errEl = document.getElementById('user-form-error');
+    if (!uid)   { errEl.textContent = 'Firebase Auth UID is required.'; return; }
     if (!email) { errEl.textContent = 'Email is required.'; return; }
     try {
-      await addDoc(collection(db, 'users'), {
-        firstName:    document.getElementById('new-user-firstname').value.trim(),
-        lastName:     document.getElementById('new-user-lastname').value.trim(),
+      /*
+        Use setDoc with the UID as the document ID — not addDoc which
+        auto-generates an ID. This is critical: the app looks up the
+        user profile using their Auth UID, so the document ID must match.
+      */
+      const { setDoc, doc: firestoreDoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      await setDoc(firestoreDoc(db, 'users', uid), {
+        firstName:     document.getElementById('new-user-firstname').value.trim(),
+        lastName:      document.getElementById('new-user-lastname').value.trim(),
         email,
-        role:         document.getElementById('new-user-role').value,
+        role:          document.getElementById('new-user-role').value,
         isBoardMember: document.getElementById('nu-is-board').checked,
         isFCMember:    document.getElementById('nu-is-fc').checked,
         isGPCMember:   document.getElementById('nu-is-gpc').checked,
@@ -1246,10 +1263,14 @@
         chairGPC:      document.getElementById('nu-chair-gpc').checked,
         createdAt:     serverTimestamp()
       });
+      document.getElementById('new-user-uid').value = '';
+      document.getElementById('new-user-firstname').value = '';
+      document.getElementById('new-user-lastname').value = '';
+      document.getElementById('new-user-email').value = '';
       document.getElementById('add-user-form').style.display = 'none';
       errEl.textContent = '';
       loadUsers();
-    } catch(e) { errEl.textContent = 'Error saving user.'; }
+    } catch(e) { console.error(e); errEl.textContent = 'Error saving user. Check the UID is correct.'; }
   });
 
 </script>
