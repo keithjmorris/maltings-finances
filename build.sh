@@ -1,12 +1,9 @@
 #!/bin/bash
-# This script runs on Vercel at build time.
-# It generates firebase-config.js from environment variables
-# so the file is never stored in GitHub.
-
 cat > firebase-config.js << JSEOF
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth }       from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp }  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth }        from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage }     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
   apiKey:            "$FIREBASE_API_KEY",
@@ -18,8 +15,8 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db   = getFirestore(app);
+export const auth    = getAuth(app);
+export const db      = getFirestore(app);
+export const storage = getStorage(app);
 JSEOF
-
 echo "firebase-config.js generated successfully"
