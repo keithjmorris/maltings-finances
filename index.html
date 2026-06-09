@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <title>Maltings Wells</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
   <style>
@@ -239,23 +238,41 @@
         <h3 id="board-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
         <p id="board-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
         <div class="sub-tab-bar">
-          <button class="sub-tab active" data-subtab="board-panel-agenda">Agenda</button>
+          <button class="sub-tab active" data-subtab="board-panel-papers">Papers</button>
           <button class="sub-tab" data-subtab="board-panel-minutes">Minutes</button>
           <button class="sub-tab" data-subtab="board-panel-actions">Actions</button>
         </div>
-        <div id="board-panel-agenda" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
-          <div id="board-agenda-compose" class="compose-area" style="display:none;">
-            <label>Agenda</label>
-            <textarea id="board-agenda-text" rows="8" placeholder="Paste or type the meeting agenda here..." style="margin-bottom:10px;"></textarea>
-            <button class="btn" id="board-post-agenda-btn">Post Agenda</button>
+        <div id="board-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
+          <div id="board-papers-compose" class="compose-area" style="display:none;">
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <label>Document Description</label>
+              <input type="text" id="board-papers-desc" placeholder="e.g. Agenda, Directors Report, Financial Summary...">
+            </div>
+            <label>Select File</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
+            <div id="board-papers-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;background:#f8fafc;">
+              <div style="font-size:24px;margin-bottom:6px;">📎</div>
+              <div style="font-size:14px;color:#64748b;">Drag and drop a file here, or click to browse</div>
+              <input type="file" id="board-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="board-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="board-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="board-post-papers-btn">Upload Document</button>
           </div>
-          <div id="board-agenda-content"></div>
+          <div id="board-papers-content"></div>
         </div>
         <div id="board-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
           <div id="board-minutes-compose" class="compose-area" style="display:none;">
-            <label>Minutes</label>
-            <textarea id="board-minutes-text" rows="8" placeholder="Paste or type the meeting minutes here..." style="margin-bottom:10px;"></textarea>
-            <button class="btn" id="board-post-minutes-btn">Post Minutes</button>
+            <label>Upload Minutes</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx). Uploading a new file will replace the existing minutes.</p>
+            <div id="board-minutes-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;background:#f8fafc;">
+              <div style="font-size:24px;margin-bottom:6px;">📋</div>
+              <div style="font-size:14px;color:#64748b;">Drag and drop minutes here, or click to browse</div>
+              <input type="file" id="board-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="board-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="board-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="board-post-minutes-btn">Upload Minutes</button>
           </div>
           <div id="board-minutes-content"></div>
         </div>
@@ -355,21 +372,41 @@
         <h3 id="fc-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
         <p id="fc-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
         <div class="sub-tab-bar">
-          <button class="sub-tab active" data-subtab="fc-panel-agenda">Agenda</button>
+          <button class="sub-tab active" data-subtab="fc-panel-papers">Papers</button>
           <button class="sub-tab" data-subtab="fc-panel-minutes">Minutes</button>
           <button class="sub-tab" data-subtab="fc-panel-actions">Actions</button>
         </div>
-        <div id="fc-panel-agenda" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
-          <div id="fc-agenda-compose" class="compose-area" style="display:none;">
-            <label>Agenda</label><textarea id="fc-agenda-text" rows="8" style="margin-bottom:10px;"></textarea>
-            <button class="btn" id="fc-post-agenda-btn">Post Agenda</button>
+        <div id="fc-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
+          <div id="fc-papers-compose" class="compose-area" style="display:none;">
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <label>Document Description</label>
+              <input type="text" id="fc-papers-desc" placeholder="e.g. Agenda, Financial Summary...">
+            </div>
+            <label>Select File</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
+            <div id="fc-papers-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;background:#f8fafc;">
+              <div style="font-size:24px;margin-bottom:6px;">📎</div>
+              <div style="font-size:14px;color:#64748b;">Drag and drop a file here, or click to browse</div>
+              <input type="file" id="fc-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="fc-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="fc-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="fc-post-papers-btn">Upload Document</button>
           </div>
-          <div id="fc-agenda-content"></div>
+          <div id="fc-papers-content"></div>
         </div>
         <div id="fc-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
           <div id="fc-minutes-compose" class="compose-area" style="display:none;">
-            <label>Minutes</label><textarea id="fc-minutes-text" rows="8" style="margin-bottom:10px;"></textarea>
-            <button class="btn" id="fc-post-minutes-btn">Post Minutes</button>
+            <label>Upload Minutes</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Uploading a new file will replace the existing minutes.</p>
+            <div id="fc-minutes-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;background:#f8fafc;">
+              <div style="font-size:24px;margin-bottom:6px;">📋</div>
+              <div style="font-size:14px;color:#64748b;">Drag and drop minutes here, or click to browse</div>
+              <input type="file" id="fc-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="fc-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="fc-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="fc-post-minutes-btn">Upload Minutes</button>
           </div>
           <div id="fc-minutes-content"></div>
         </div>
@@ -448,21 +485,41 @@
         <h3 id="gpc-meeting-detail-title" style="font-size:18px;font-weight:700;margin-bottom:4px;"></h3>
         <p id="gpc-meeting-detail-date" style="font-size:14px;color:#64748b;margin-bottom:16px;"></p>
         <div class="sub-tab-bar">
-          <button class="sub-tab active" data-subtab="gpc-panel-agenda">Agenda</button>
+          <button class="sub-tab active" data-subtab="gpc-panel-papers">Papers</button>
           <button class="sub-tab" data-subtab="gpc-panel-minutes">Minutes</button>
           <button class="sub-tab" data-subtab="gpc-panel-actions">Actions</button>
         </div>
-        <div id="gpc-panel-agenda" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
-          <div id="gpc-agenda-compose" class="compose-area" style="display:none;">
-            <label>Agenda</label><textarea id="gpc-agenda-text" rows="8" style="margin-bottom:10px;"></textarea>
-            <button class="btn" id="gpc-post-agenda-btn">Post Agenda</button>
+        <div id="gpc-panel-papers" class="sub-panel active card" style="border-radius:0 8px 8px 8px;">
+          <div id="gpc-papers-compose" class="compose-area" style="display:none;">
+            <div class="form-row-full" style="margin-bottom:10px;">
+              <label>Document Description</label>
+              <input type="text" id="gpc-papers-desc" placeholder="e.g. Agenda, Financial Summary...">
+            </div>
+            <label>Select File</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Accepted: PDF, Word (.docx), PowerPoint (.pptx)</p>
+            <div id="gpc-papers-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;background:#f8fafc;">
+              <div style="font-size:24px;margin-bottom:6px;">📎</div>
+              <div style="font-size:14px;color:#64748b;">Drag and drop a file here, or click to browse</div>
+              <input type="file" id="gpc-papers-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="gpc-papers-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="gpc-papers-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="gpc-post-papers-btn">Upload Document</button>
           </div>
-          <div id="gpc-agenda-content"></div>
+          <div id="gpc-papers-content"></div>
         </div>
         <div id="gpc-panel-minutes" class="sub-panel card" style="display:none;border-radius:0 8px 8px 8px;">
           <div id="gpc-minutes-compose" class="compose-area" style="display:none;">
-            <label>Minutes</label><textarea id="gpc-minutes-text" rows="8" style="margin-bottom:10px;"></textarea>
-            <button class="btn" id="gpc-post-minutes-btn">Post Minutes</button>
+            <label>Upload Minutes</label>
+            <p style="font-size:13px;color:#64748b;margin-bottom:8px;">Uploading a new file will replace the existing minutes.</p>
+            <div id="gpc-minutes-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:24px;text-align:center;cursor:pointer;margin-bottom:10px;background:#f8fafc;">
+              <div style="font-size:24px;margin-bottom:6px;">📋</div>
+              <div style="font-size:14px;color:#64748b;">Drag and drop minutes here, or click to browse</div>
+              <input type="file" id="gpc-minutes-file" accept=".pdf,.doc,.docx,.ppt,.pptx" style="display:none;">
+            </div>
+            <div id="gpc-minutes-selected" style="font-size:13px;color:#2979FF;margin-bottom:8px;"></div>
+            <div id="gpc-minutes-upload-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Uploading...</div>
+            <button class="btn" id="gpc-post-minutes-btn">Upload Minutes</button>
           </div>
           <div id="gpc-minutes-content"></div>
         </div>
@@ -578,7 +635,7 @@
 
 
 <script type="module">
-  import { auth, db } from './firebase-config.js';
+  import { auth, db, storage } from './firebase-config.js';
   import {
     signInWithEmailAndPassword, signOut, onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
@@ -586,6 +643,9 @@
     collection, doc, addDoc, getDoc, getDocs, updateDoc, query,
     where, orderBy, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import {
+    ref, uploadBytesResumable, getDownloadURL
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
   // ── STATE ──────────────────────────────────────────────────────────────────
 
@@ -903,7 +963,7 @@
         row.className = 'meeting-row';
         row.innerHTML = `<div><div class="meeting-row-title">${m.title}</div><div class="meeting-row-date">${m.meetingDate}</div></div>
           <div class="meeting-badges">
-            ${m.hasAgenda ? '<span class="mbadge mbadge-agenda">Agenda</span>' : ''}
+            ${m.hasAgenda ? '<span class="mbadge mbadge-agenda">Papers</span>' : ''}
             ${m.hasMinutes ? '<span class="mbadge mbadge-minutes">Minutes</span>' : ''}
           </div>`;
         row.addEventListener('click', () => openMeeting(prefix, d.id));
@@ -950,57 +1010,205 @@
     document.getElementById(prefix + '-meeting-detail').style.display = 'block';
     document.getElementById(prefix + '-meeting-detail-title').textContent = m.title;
     document.getElementById(prefix + '-meeting-detail-date').textContent = m.meetingDate;
-    // Reset to agenda sub-tab
+    // Reset to papers sub-tab
     const detail = document.getElementById(prefix + '-meeting-detail');
     detail.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('active'));
     detail.querySelectorAll('.sub-panel').forEach(p => { p.style.display='none'; p.classList.remove('active'); });
-    detail.querySelector('[data-subtab="' + prefix + '-panel-agenda"]').classList.add('active');
-    document.getElementById(prefix + '-panel-agenda').style.display = 'block';
-    document.getElementById(prefix + '-panel-agenda').classList.add('active');
+    detail.querySelector('[data-subtab="' + prefix + '-panel-papers"]').classList.add('active');
+    document.getElementById(prefix + '-panel-papers').style.display = 'block';
+    document.getElementById(prefix + '-panel-papers').classList.add('active');
     // Show compose areas based on role
-    const canPost = canPostForCommittee(prefix);
-    document.getElementById(prefix + '-agenda-compose').style.display   = canPost ? 'block' : 'none';
-    document.getElementById(prefix + '-minutes-compose').style.display  = canPost ? 'block' : 'none';
-    document.getElementById(prefix + '-actions-compose').style.display  = canPost ? 'block' : 'none';
-    loadAgenda(prefix);
+    // Board: CEO, Board Chair, FC Chair, GPC Chair can all post
+    // FC: CEO and FC Chair only
+    // GPC: CEO and GPC Chair only
+    const canPost = prefix === 'board'
+      ? (isCEO() || currentUserData?.chairBoard || currentUserData?.chairFC || currentUserData?.chairGPC)
+      : canPostForCommittee(prefix);
+    document.getElementById(prefix + '-papers-compose').style.display  = canPost ? 'block' : 'none';
+    document.getElementById(prefix + '-minutes-compose').style.display = canPost ? 'block' : 'none';
+    document.getElementById(prefix + '-actions-compose').style.display = canPost ? 'block' : 'none';
+    setupDropzone(prefix + '-papers-dropzone', prefix + '-papers-file', prefix + '-papers-selected');
+    setupDropzone(prefix + '-minutes-dropzone', prefix + '-minutes-file', prefix + '-minutes-selected');
+    loadPapers(prefix);
     loadMinutes(prefix);
   }
 
-  // ── AGENDA ────────────────────────────────────────────────────────────────
+  // ── DRAG AND DROP SETUP ───────────────────────────────────────────────────
 
-  async function loadAgenda(prefix) {
-    const el = document.getElementById(prefix + '-agenda-content');
+  function setupDropzone(dropzoneId, fileInputId, selectedId) {
+    const dropzone = document.getElementById(dropzoneId);
+    const fileInput = document.getElementById(fileInputId);
+    const selectedEl = document.getElementById(selectedId);
+    if (!dropzone || !fileInput) return;
+
+    // Click to browse
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    // Show selected filename
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files[0]) {
+        selectedEl.textContent = '📎 ' + fileInput.files[0].name;
+        dropzone.style.borderColor = '#2979FF';
+      }
+    });
+
+    // Drag and drop
+    dropzone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#2979FF';
+      dropzone.style.background = '#eff6ff';
+    });
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.style.borderColor = '#cbd5e1';
+      dropzone.style.background = '#f8fafc';
+    });
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.style.borderColor = '#cbd5e1';
+      dropzone.style.background = '#f8fafc';
+      const file = e.dataTransfer.files[0];
+      if (file) {
+        // Transfer dropped file to the input
+        const dt = new DataTransfer();
+        dt.items.add(file);
+        fileInput.files = dt.files;
+        selectedEl.textContent = '📎 ' + file.name;
+        dropzone.style.borderColor = '#2979FF';
+      }
+    });
+  }
+
+  // ── PAPERS (multiple documents per meeting) ───────────────────────────────
+
+  async function loadPapers(prefix) {
+    const el = document.getElementById(prefix + '-papers-content');
     el.innerHTML = '<p class="empty-state">Loading...</p>';
-    const col = COMMITTEE_COLLECTIONS[prefix].agenda;
+    const col = COMMITTEE_COLLECTIONS[prefix].agenda; // reuse agenda collection, now stores papers
     try {
-      const snap = await getDocs(query(collection(db, col), where('meetingId','==',currentMeetingId[prefix]), orderBy('createdAt','desc')));
-      if (snap.empty) { el.innerHTML = '<p class="empty-state">No agenda posted yet.</p>'; return; }
+      const snap = await getDocs(query(collection(db, col), where('meetingId','==',currentMeetingId[prefix]), orderBy('createdAt','asc')));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No papers uploaded yet.</p>'; return; }
       el.innerHTML = '';
       snap.forEach(d => {
         const a = d.data();
         const div = document.createElement('div');
         div.className = 'card';
-        div.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><strong>Agenda</strong><span style="font-size:12px;color:#94a3b8;">${formatDate(a.createdAt)}</span></div>
-          <div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">Posted by ${a.authorEmail}</div>
-          <div style="font-size:14px;white-space:pre-wrap;line-height:1.6;">${a.content}</div>`;
+        div.style.marginBottom = '10px';
+        const fileIcon = a.fileName?.endsWith('.pdf') ? '📄' : (a.fileName?.endsWith('.pptx') || a.fileName?.endsWith('.ppt')) ? '📊' : '📝';
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+            <div style="min-width:0;">
+              <div style="font-weight:600;margin-bottom:2px;">${fileIcon} ${a.description || 'Document'}</div>
+              <div style="font-size:13px;color:#64748b;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${a.fileName || ''}</div>
+              <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Uploaded by ${a.authorEmail} · ${formatDate(a.createdAt)}</div>
+            </div>
+            <a href="${a.downloadURL}" target="_blank" class="btn btn-sm" style="text-decoration:none;white-space:nowrap;flex-shrink:0;">⬇ Download</a>
+          </div>`;
         el.appendChild(div);
       });
     } catch(e) { console.error(e); }
   }
 
   ['board','fc','gpc'].forEach(prefix => {
-    document.getElementById(prefix + '-post-agenda-btn').addEventListener('click', async () => {
-      const content = document.getElementById(prefix + '-agenda-text').value.trim();
-      if (!content) return;
+    document.getElementById(prefix + '-post-papers-btn').addEventListener('click', async () => {
+      const fileInput  = document.getElementById(prefix + '-papers-file');
+      const descInput  = document.getElementById(prefix + '-papers-desc');
+      const progressEl = document.getElementById(prefix + '-papers-upload-progress');
+      const selectedEl = document.getElementById(prefix + '-papers-selected');
+      const file = fileInput.files[0];
+      if (!file) { alert('Please select a file to upload.'); return; }
+      const description = descInput.value.trim() || file.name;
       const col = COMMITTEE_COLLECTIONS[prefix];
-      await addDoc(collection(db, col.agenda), { meetingId:currentMeetingId[prefix], content, authorEmail:currentUser.email, createdAt:serverTimestamp() });
-      await updateDoc(doc(db, col.meetings, currentMeetingId[prefix]), { hasAgenda:true });
-      document.getElementById(prefix + '-agenda-text').value = '';
-      loadAgenda(prefix);
+      const storagePath = `${prefix}/meetings/${currentMeetingId[prefix]}/papers/${Date.now()}_${file.name}`;
+      try {
+        await uploadDocument(storagePath, file, col.agenda,
+          { meetingId: currentMeetingId[prefix], description },
+          progressEl
+        );
+        await updateDoc(doc(db, col.meetings, currentMeetingId[prefix]), { hasAgenda: true });
+        fileInput.value = '';
+        descInput.value = '';
+        selectedEl.textContent = '';
+        document.getElementById(prefix + '-papers-dropzone').style.borderColor = '#cbd5e1';
+        loadPapers(prefix);
+      } catch(e) { console.error(e); }
     });
   });
 
-  // ── MINUTES ───────────────────────────────────────────────────────────────
+  // ── MINUTES UPLOAD ────────────────────────────────────────────────────────
+
+  ['board','fc','gpc'].forEach(prefix => {
+    document.getElementById(prefix + '-post-minutes-btn').addEventListener('click', async () => {
+      const fileInput  = document.getElementById(prefix + '-minutes-file');
+      const progressEl = document.getElementById(prefix + '-minutes-upload-progress');
+      const selectedEl = document.getElementById(prefix + '-minutes-selected');
+      const file = fileInput.files[0];
+      if (!file) { alert('Please select a file to upload.'); return; }
+      const col = COMMITTEE_COLLECTIONS[prefix];
+      // Single document — use fixed path so it overwrites previous minutes
+      const storagePath = `${prefix}/meetings/${currentMeetingId[prefix]}/minutes/minutes${file.name.substring(file.name.lastIndexOf('.'))}`;
+      try {
+        await uploadDocument(storagePath, file, col.minutes,
+          { meetingId: currentMeetingId[prefix], description: 'Minutes' },
+          progressEl
+        );
+        await updateDoc(doc(db, col.meetings, currentMeetingId[prefix]), { hasMinutes: true });
+        fileInput.value = '';
+        selectedEl.textContent = '';
+        document.getElementById(prefix + '-minutes-dropzone').style.borderColor = '#cbd5e1';
+        loadMinutes(prefix);
+      } catch(e) { console.error(e); }
+    });
+  });
+
+  /*
+    Uploads a file to Firebase Storage and saves the download URL
+    to Firestore. Shows a progress indicator while uploading.
+
+    path:       Storage path e.g. 'board/meetings/meetingId/agenda/filename'
+    file:       The File object from the input element
+    collection: Firestore collection name
+    extraData:  Additional fields to save alongside the URL
+    progressEl: Element to show upload progress
+  */
+  async function uploadDocument(storagePath, file, firestoreCol, extraData, progressEl) {
+    progressEl.style.display = 'block';
+    progressEl.textContent = 'Uploading...';
+
+    const storageRef = ref(storage, storagePath);
+    const uploadTask = uploadBytesResumable(storageRef, file);
+
+    return new Promise((resolve, reject) => {
+      uploadTask.on('state_changed',
+        snapshot => {
+          const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          progressEl.textContent = `Uploading... ${pct}%`;
+        },
+        error => {
+          progressEl.textContent = 'Upload failed. Please try again.';
+          console.error(error);
+          reject(error);
+        },
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          await addDoc(collection(db, firestoreCol), {
+            ...extraData,
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type,
+            downloadURL,
+            authorEmail: currentUser.email,
+            createdAt: serverTimestamp()
+          });
+          progressEl.style.display = 'none';
+          resolve(downloadURL);
+        }
+      );
+    });
+  }
+
+  // ── DOCUMENT UPLOAD HELPER ────────────────────────────────────────────────
+
+  // ── LOAD MINUTES ─────────────────────────────────────────────────────────
 
   async function loadMinutes(prefix) {
     const el = document.getElementById(prefix + '-minutes-content');
@@ -1008,31 +1216,27 @@
     const col = COMMITTEE_COLLECTIONS[prefix].minutes;
     try {
       const snap = await getDocs(query(collection(db, col), where('meetingId','==',currentMeetingId[prefix]), orderBy('createdAt','desc')));
-      if (snap.empty) { el.innerHTML = '<p class="empty-state">No minutes posted yet.</p>'; return; }
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No minutes uploaded yet.</p>'; return; }
       el.innerHTML = '';
       snap.forEach(d => {
         const m = d.data();
         const div = document.createElement('div');
         div.className = 'card';
-        div.innerHTML = `<div style="display:flex;justify-content:space-between;margin-bottom:6px;"><strong>Minutes</strong><span style="font-size:12px;color:#94a3b8;">${formatDate(m.createdAt)}</span></div>
-          <div style="font-size:12px;color:#94a3b8;margin-bottom:8px;">Posted by ${m.authorEmail}</div>
-          <div style="font-size:14px;white-space:pre-wrap;line-height:1.6;">${m.content}</div>`;
+        div.style.marginBottom = '10px';
+        const fileIcon = m.fileName?.endsWith('.pdf') ? '📄' : m.fileName?.endsWith('.pptx') || m.fileName?.endsWith('.ppt') ? '📊' : '📝';
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <div>
+              <div style="font-weight:600;margin-bottom:4px;">${fileIcon} Minutes</div>
+              <div style="font-size:13px;color:#64748b;">${m.fileName || 'Document'}</div>
+              <div style="font-size:12px;color:#94a3b8;margin-top:2px;">Uploaded by ${m.authorEmail} · ${formatDate(m.createdAt)}</div>
+            </div>
+            <a href="${m.downloadURL}" target="_blank" class="btn btn-sm" style="text-decoration:none;white-space:nowrap;">⬇ Download</a>
+          </div>`;
         el.appendChild(div);
       });
     } catch(e) { console.error(e); }
   }
-
-  ['board','fc','gpc'].forEach(prefix => {
-    document.getElementById(prefix + '-post-minutes-btn').addEventListener('click', async () => {
-      const content = document.getElementById(prefix + '-minutes-text').value.trim();
-      if (!content) return;
-      const col = COMMITTEE_COLLECTIONS[prefix];
-      await addDoc(collection(db, col.minutes), { meetingId:currentMeetingId[prefix], content, authorEmail:currentUser.email, createdAt:serverTimestamp() });
-      await updateDoc(doc(db, col.meetings, currentMeetingId[prefix]), { hasMinutes:true });
-      document.getElementById(prefix + '-minutes-text').value = '';
-      loadMinutes(prefix);
-    });
-  });
 
   // ── ACTIONS ───────────────────────────────────────────────────────────────
 
