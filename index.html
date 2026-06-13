@@ -145,8 +145,37 @@
     /* Empty state */
     .empty-state { color:#94a3b8; font-size:14px; padding:12px 0; }
 
+    /* ── DISCUSSION ── */
+    .topic-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+    .topic-card:hover { background: #f8fafc; }
+    .topic-title { font-size: 15px; font-weight: 600; color: #0f172a; margin-bottom: 4px; }
+    .topic-meta { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+    .topic-preview { font-size: 13px; color: #475569; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .topic-footer { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .topic-tag { padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; background: #eff6ff; color: #2563eb; }
+    .topic-tag.tag-board { background: #f0fdf4; color: #166534; }
+    .topic-tag.tag-fc { background: #fef9c3; color: #854d0e; }
+    .topic-tag.tag-gpc { background: #fdf4ff; color: #7e22ce; }
+    .topic-reply-count { font-size: 12px; color: #94a3b8; margin-left: auto; }
+    .reply-card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; }
+    .reply-meta { font-size: 12px; color: #94a3b8; margin-bottom: 6px; }
+    .reply-body { font-size: 14px; color: #374151; white-space: pre-wrap; line-height: 1.6; }
+    .topic-body-full { font-size: 14px; color: #374151; white-space: pre-wrap; line-height: 1.6; margin-bottom: 12px; }
+    .topic-detail-header { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+    .topic-detail-title { font-size: 18px; font-weight: 700; margin-bottom: 6px; }
+    .attachment-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #2979FF; margin-top: 8px; cursor: pointer; }
+
     /* Staff actions banner */
-    .staff-banner { background:#fef9c3; border:1px solid #fde68a; border-radius:10px; padding:14px 16px; margin-bottom:16px; font-size:14px; color:#854d0e; }
+    .staff-banner { background: #fef9c3; border: 1px solid #fde68a; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; font-size: 14px; color: #854d0e; }
+
+
 
     @media(max-width:600px) {
       .form-row { grid-template-columns:1fr; }
@@ -211,6 +240,7 @@
       <button class="mtab active" data-mtab="board-tab-meetings">Meetings</button>
       <button class="mtab" data-mtab="board-tab-outstanding">Outstanding Actions</button>
       <button class="mtab" data-mtab="board-tab-all">All Actions</button>
+      <button class="mtab" data-mtab="board-tab-discussion">Discussion</button>
     </div>
 
     <!-- Meetings tab -->
@@ -337,6 +367,10 @@
       </div>
       <div id="board-all-list"></div>
     </div>
+    <!-- Board Discussion tab -->
+    <div class="mtab-content" id="board-tab-discussion" style="margin-top:16px;">
+      <div id="board-disc-topics-list"><p class="empty-state">Loading...</p></div>
+    </div>
   </div>
 
   <!-- FINANCE COMMITTEE PAGE (identical structure, different prefix) -->
@@ -347,6 +381,7 @@
       <button class="mtab active" data-mtab="fc-tab-meetings">Meetings</button>
       <button class="mtab" data-mtab="fc-tab-outstanding">Outstanding Actions</button>
       <button class="mtab" data-mtab="fc-tab-all">All Actions</button>
+      <button class="mtab" data-mtab="fc-tab-discussion">Discussion</button>
     </div>
     <div class="mtab-content active" id="fc-tab-meetings">
       <div id="fc-meetings-list-view" style="margin-top:16px;">
@@ -450,6 +485,10 @@
       </div>
       <div id="fc-all-list"></div>
     </div>
+    <!-- FC Discussion tab -->
+    <div class="mtab-content" id="fc-tab-discussion" style="margin-top:16px;">
+      <div id="fc-disc-topics-list"><p class="empty-state">Loading...</p></div>
+    </div>
   </div>
 
   <!-- GENERAL PURPOSES COMMITTEE PAGE -->
@@ -460,6 +499,7 @@
       <button class="mtab active" data-mtab="gpc-tab-meetings">Meetings</button>
       <button class="mtab" data-mtab="gpc-tab-outstanding">Outstanding Actions</button>
       <button class="mtab" data-mtab="gpc-tab-all">All Actions</button>
+      <button class="mtab" data-mtab="gpc-tab-discussion">Discussion</button>
     </div>
     <div class="mtab-content active" id="gpc-tab-meetings">
       <div id="gpc-meetings-list-view" style="margin-top:16px;">
@@ -563,6 +603,10 @@
       </div>
       <div id="gpc-all-list"></div>
     </div>
+    <!-- GPC Discussion tab -->
+    <div class="mtab-content" id="gpc-tab-discussion" style="margin-top:16px;">
+      <div id="gpc-disc-topics-list"><p class="empty-state">Loading...</p></div>
+    </div>
   </div>
 
   <!-- MANAGE USERS PAGE -->
@@ -629,7 +673,91 @@
     <button class="tab-item" data-tab="board"><span class="tab-icon">🗂</span>Board</button>
     <button class="tab-item" data-tab="finance-committee"><span class="tab-icon">📊</span>Finance Cttee</button>
     <button class="tab-item" data-tab="gpc"><span class="tab-icon">📋</span>Gen Purposes</button>
+    <button class="tab-item" data-tab="discussion"><span class="tab-icon">💬</span>Discussion</button>
   </nav>
+
+  <!-- DISCUSSION PAGE -->
+  <div id="page-discussion" class="page">
+  <!-- Topic list view -->
+  <div id="disc-list-view">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+      <div>
+        <h2 style="font-size:20px;font-weight:700;">Discussion</h2>
+        <p style="font-size:13px;color:#64748b;">All topics</p>
+      </div>
+      <button class="btn" id="disc-new-topic-btn">+ New Topic</button>
+    </div>
+    <!-- Filter by committee tag -->
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+      <button class="filter-btn active" data-disc-filter="all">All</button>
+      <button class="filter-btn" data-disc-filter="general">General</button>
+      <button class="filter-btn" data-disc-filter="board">Board</button>
+      <button class="filter-btn" data-disc-filter="fc">Finance Cttee</button>
+      <button class="filter-btn" data-disc-filter="gpc">Gen Purposes</button>
+    </div>
+    <div id="disc-topics-list"><p class="empty-state">Loading...</p></div>
+  </div>
+
+  <!-- New topic form -->
+  <div id="disc-new-topic-form" style="display:none;" class="card">
+    <h3 style="font-size:15px;font-weight:600;margin-bottom:16px;">New Topic</h3>
+    <div class="form-row-full" style="margin-bottom:14px;">
+      <label>Title *</label>
+      <input type="text" id="disc-topic-title" placeholder="What would you like to discuss?">
+    </div>
+    <div class="form-row-full" style="margin-bottom:14px;">
+      <label>Message *</label>
+      <textarea id="disc-topic-body" rows="5" placeholder="Share your thoughts..."></textarea>
+    </div>
+    <!-- Committee tags -->
+    <div style="margin-bottom:14px;">
+      <label style="margin-bottom:8px;">Tag to committee (optional — select all that apply)</label>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;margin-top:6px;">
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="disc-tag-general" style="width:auto;" checked> General</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="disc-tag-board" style="width:auto;"> Board</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="disc-tag-fc" style="width:auto;"> Finance Committee</label>
+        <label style="display:flex;align-items:center;gap:6px;font-weight:400;"><input type="checkbox" id="disc-tag-gpc" style="width:auto;"> General Purposes</label>
+      </div>
+    </div>
+    <!-- Optional attachment -->
+    <div style="margin-bottom:14px;">
+      <label style="margin-bottom:6px;">Attachment (optional)</label>
+      <div id="disc-topic-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:16px;text-align:center;cursor:pointer;background:#f8fafc;">
+        <div style="font-size:20px;margin-bottom:4px;">📎</div>
+        <div style="font-size:13px;color:#64748b;">Drag and drop or click to attach a file</div>
+        <input type="file" id="disc-topic-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" style="display:none;">
+      </div>
+      <div id="disc-topic-file-selected" style="font-size:13px;color:#2979FF;margin-top:6px;"></div>
+    </div>
+    <div id="disc-topic-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Posting...</div>
+    <div class="form-actions">
+      <button class="btn" id="disc-post-topic-btn">Post Topic</button>
+      <button class="btn btn-secondary" id="disc-cancel-topic-btn">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Topic detail / thread view -->
+  <div id="disc-thread-view" style="display:none;">
+    <button class="back-button" id="disc-back-to-list">‹ &nbsp;All Topics</button>
+    <div id="disc-thread-content"></div>
+    <!-- Reply form -->
+    <div class="card" style="margin-top:16px;">
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:12px;">Reply</h4>
+      <div class="form-row-full" style="margin-bottom:10px;">
+        <textarea id="disc-reply-body" rows="3" placeholder="Write your reply..."></textarea>
+      </div>
+      <div style="margin-bottom:10px;">
+        <div id="disc-reply-dropzone" style="border:2px dashed #cbd5e1;border-radius:8px;padding:12px;text-align:center;cursor:pointer;background:#f8fafc;">
+          <div style="font-size:13px;color:#64748b;">📎 Attach a file (optional)</div>
+          <input type="file" id="disc-reply-file" accept=".pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png" style="display:none;">
+        </div>
+        <div id="disc-reply-file-selected" style="font-size:13px;color:#2979FF;margin-top:4px;"></div>
+      </div>
+      <div id="disc-reply-progress" style="display:none;font-size:13px;color:#2979FF;margin-bottom:8px;">Posting...</div>
+      <button class="btn" id="disc-post-reply-btn">Post Reply</button>
+    </div>
+  </div>
+  </div><!-- end page-discussion -->
 
 </div><!-- end #app -->
 
@@ -1500,7 +1628,332 @@
       loadUsers();
     } catch(e) { console.error(e); errEl.textContent = 'Error saving user. Check the UID is correct.'; }
   });
+  // ── DISCUSSION ────────────────────────────────────────────────────────────
 
-</script>
-</body>
-</html>
+  let currentTopicId = null;
+
+  // Tag labels and CSS classes
+  const TAG_LABELS = { general: 'General', board: 'Board', fc: 'Finance Cttee', gpc: 'Gen Purposes' };
+  const TAG_CLASSES = { general: '', board: 'tag-board', fc: 'tag-fc', gpc: 'tag-gpc' };
+
+  // Setup Discussion page navigation
+  document.getElementById('disc-new-topic-btn').addEventListener('click', () => {
+    document.getElementById('disc-list-view').style.display = 'none';
+    document.getElementById('disc-new-topic-form').style.display = 'block';
+    document.getElementById('disc-thread-view').style.display = 'none';
+  });
+
+  document.getElementById('disc-cancel-topic-btn').addEventListener('click', () => {
+    document.getElementById('disc-new-topic-form').style.display = 'none';
+    document.getElementById('disc-list-view').style.display = 'block';
+  });
+
+  document.getElementById('disc-back-to-list').addEventListener('click', () => {
+    document.getElementById('disc-thread-view').style.display = 'none';
+    document.getElementById('disc-list-view').style.display = 'block';
+    currentTopicId = null;
+  });
+
+  // Setup dropzones for discussion
+  setupDropzone('disc-topic-dropzone', 'disc-topic-file', 'disc-topic-file-selected');
+  setupDropzone('disc-reply-dropzone', 'disc-reply-file', 'disc-reply-file-selected');
+
+  // Discussion filter buttons
+  document.querySelectorAll('[data-disc-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('[data-disc-filter]').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadDiscussionTopics('all', btn.dataset.discFilter);
+    });
+  });
+
+  // Load discussion when tab is clicked
+  document.querySelectorAll('.tab-item[data-tab]').forEach(btn => {
+    if (btn.dataset.tab === 'discussion') {
+      btn.addEventListener('click', () => loadDiscussionTopics('all', 'all'));
+    }
+  });
+
+  // Load committee-specific discussion when mtab clicked
+  document.querySelectorAll('.mtab[data-mtab$="-discussion"]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      const prefix = tab.dataset.mtab.replace('-tab-discussion', '');
+      loadCommitteeDiscussion(prefix);
+    });
+  });
+
+  /*
+    Load topics for the main Discussion page.
+    listEl: 'all' means use disc-topics-list
+    filter: committee tag to filter by, or 'all'
+  */
+  async function loadDiscussionTopics(listEl, filter) {
+    const el = document.getElementById('disc-topics-list');
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(query(
+        collection(db, 'discussion-topics'),
+        orderBy('createdAt', 'desc')
+      ));
+      let docs = snap.docs;
+      if (filter && filter !== 'all') {
+        docs = docs.filter(d => d.data().tags?.includes(filter));
+      }
+      if (docs.length === 0) { el.innerHTML = '<p class="empty-state">No topics yet. Start the discussion!</p>'; return; }
+      el.innerHTML = '';
+      docs.forEach(d => el.appendChild(renderTopicCard(d, 'all')));
+    } catch(e) { console.error(e); el.innerHTML = '<p class="empty-state">Error loading topics.</p>'; }
+  }
+
+  // Load topics filtered to a specific committee
+  async function loadCommitteeDiscussion(prefix) {
+    const el = document.getElementById(prefix + '-disc-topics-list');
+    if (!el) return;
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(query(
+        collection(db, 'discussion-topics'),
+        orderBy('createdAt', 'desc')
+      ));
+      const docs = snap.docs.filter(d => d.data().tags?.includes(prefix));
+      if (docs.length === 0) { el.innerHTML = '<p class="empty-state">No topics tagged to this committee yet.</p>'; return; }
+      el.innerHTML = '';
+      docs.forEach(d => el.appendChild(renderTopicCard(d, prefix)));
+    } catch(e) { console.error(e); }
+  }
+
+  function renderTopicCard(docSnap, context) {
+    const t = docSnap.data();
+    const div = document.createElement('div');
+    div.className = 'topic-card';
+    const tags = (t.tags || []).map(tag =>
+      `<span class="topic-tag ${TAG_CLASSES[tag] || ''}">${TAG_LABELS[tag] || tag}</span>`
+    ).join(' ');
+    div.innerHTML = `
+      <div class="topic-title">${t.title}</div>
+      <div class="topic-meta">By ${t.authorEmail} · ${formatDate(t.createdAt)}</div>
+      <div class="topic-preview">${t.body || ''}</div>
+      <div class="topic-footer">
+        ${tags}
+        <span class="topic-reply-count">💬 ${t.replyCount || 0} ${t.replyCount === 1 ? 'reply' : 'replies'}</span>
+      </div>`;
+    div.addEventListener('click', () => openTopic(docSnap.id, context));
+    return div;
+  }
+
+  async function openTopic(topicId, context) {
+    currentTopicId = topicId;
+    const snap = await getDoc(doc(db, 'discussion-topics', topicId));
+    const t = snap.data();
+
+    // Switch to thread view
+    document.getElementById('disc-list-view').style.display = 'none';
+    document.getElementById('disc-new-topic-form').style.display = 'none';
+    document.getElementById('disc-thread-view').style.display = 'block';
+
+    // Also switch the main Discussion page if coming from a committee tab
+    if (context !== 'all') {
+      showPage('discussion');
+      document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-tab="discussion"]').classList.add('active');
+    }
+
+    const tags = (t.tags || []).map(tag =>
+      `<span class="topic-tag ${TAG_CLASSES[tag] || ''}">${TAG_LABELS[tag] || tag}</span>`
+    ).join(' ');
+
+    const attachment = t.attachmentURL ? `
+      <div class="attachment-link" onclick="downloadFile('${t.attachmentURL}', '${t.attachmentName}')">
+        📎 ${t.attachmentName}
+      </div>` : '';
+
+    // Admin tag edit
+    const tagEdit = isAdmin() ? `
+      <div style="margin-top:12px;padding-top:12px;border-top:1px solid #e2e8f0;">
+        <label style="font-size:12px;font-weight:600;color:#64748b;margin-bottom:6px;">Edit tags (admin):</label>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:4px;">
+          ${['general','board','fc','gpc'].map(tag => `
+            <label style="display:flex;align-items:center;gap:4px;font-size:13px;font-weight:400;">
+              <input type="checkbox" class="tag-edit-cb" data-tag="${tag}" style="width:auto;"
+                ${(t.tags||[]).includes(tag) ? 'checked' : ''}>
+              ${TAG_LABELS[tag]}
+            </label>`).join('')}
+        </div>
+        <button class="btn btn-sm" style="margin-top:8px;" id="save-tags-btn">Save Tags</button>
+      </div>` : '';
+
+    // Admin delete
+    const deleteBtn = isAdmin() ? `<button class="btn btn-sm btn-danger" style="margin-top:8px;" id="delete-topic-btn">Delete Topic</button>` : '';
+
+    document.getElementById('disc-thread-content').innerHTML = `
+      <div class="topic-detail-header">
+        <div class="topic-detail-title">${t.title}</div>
+        <div class="topic-meta">By ${t.authorEmail} · ${formatDate(t.createdAt)}</div>
+        <div class="topic-footer" style="margin-bottom:8px;">${tags}</div>
+        <div class="topic-body-full">${t.body || ''}</div>
+        ${attachment}
+        ${tagEdit}
+        ${deleteBtn}
+      </div>
+      <h4 style="font-size:14px;font-weight:600;margin-bottom:10px;">Replies</h4>
+      <div id="disc-replies-list"></div>`;
+
+    loadReplies(topicId);
+
+    // Save tags button
+    document.getElementById('save-tags-btn')?.addEventListener('click', async () => {
+      const selectedTags = [...document.querySelectorAll('.tag-edit-cb')]
+        .filter(cb => cb.checked).map(cb => cb.dataset.tag);
+      await updateDoc(doc(db, 'discussion-topics', topicId), { tags: selectedTags });
+      openTopic(topicId, context);
+    });
+
+    // Delete topic button
+    document.getElementById('delete-topic-btn')?.addEventListener('click', async () => {
+      if (!confirm('Delete this topic and all its replies? This cannot be undone.')) return;
+      const { deleteDoc, doc: fdoc } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      await deleteDoc(fdoc(db, 'discussion-topics', topicId));
+      document.getElementById('disc-thread-view').style.display = 'none';
+      document.getElementById('disc-list-view').style.display = 'block';
+      loadDiscussionTopics('all', 'all');
+    });
+  }
+
+  async function loadReplies(topicId) {
+    const el = document.getElementById('disc-replies-list');
+    if (!el) return;
+    el.innerHTML = '<p class="empty-state">Loading...</p>';
+    try {
+      const snap = await getDocs(query(
+        collection(db, 'discussion-replies'),
+        where('topicId', '==', topicId),
+        orderBy('createdAt', 'asc')
+      ));
+      if (snap.empty) { el.innerHTML = '<p class="empty-state">No replies yet — be the first!</p>'; return; }
+      el.innerHTML = '';
+      snap.forEach(d => {
+        const r = d.data();
+        const div = document.createElement('div');
+        div.className = 'reply-card';
+        const attachment = r.attachmentURL ? `
+          <div class="attachment-link" onclick="downloadFile('${r.attachmentURL}', '${r.attachmentName}')">
+            📎 ${r.attachmentName}
+          </div>` : '';
+        const deleteBtn = isAdmin() ? `<button class="btn btn-sm btn-danger" style="margin-top:8px;font-size:11px;" onclick="deleteReply('${d.id}', '${topicId}')">Delete</button>` : '';
+        div.innerHTML = `
+          <div class="reply-meta">${r.authorEmail} · ${formatDate(r.createdAt)}</div>
+          <div class="reply-body">${r.body || ''}</div>
+          ${attachment}
+          ${deleteBtn}`;
+        el.appendChild(div);
+      });
+    } catch(e) { console.error(e); }
+  }
+
+  window.deleteReply = async function(replyId, topicId) {
+    if (!confirm('Delete this reply?')) return;
+    const { deleteDoc, doc: fdoc, increment } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+    await deleteDoc(fdoc(db, 'discussion-replies', replyId));
+    await updateDoc(doc(db, 'discussion-topics', topicId), { replyCount: increment(-1) });
+    loadReplies(topicId);
+  };
+
+  // Post new topic
+  document.getElementById('disc-post-topic-btn').addEventListener('click', async () => {
+    const title = document.getElementById('disc-topic-title').value.trim();
+    const body  = document.getElementById('disc-topic-body').value.trim();
+    if (!title || !body) { alert('Please enter a title and message.'); return; }
+
+    const tags = ['general','board','fc','gpc'].filter(tag =>
+      document.getElementById('disc-tag-' + tag).checked
+    );
+
+    const progressEl = document.getElementById('disc-topic-progress');
+    progressEl.style.display = 'block';
+
+    try {
+      let attachmentURL = null, attachmentName = null;
+      const file = document.getElementById('disc-topic-file').files[0];
+      if (file) {
+        const storagePath = `discussion/topics/${Date.now()}_${file.name}`;
+        const storageRef = ref(storage, storagePath);
+        const snap = await uploadBytesResumable(storageRef, file);
+        // Wait for upload
+        await new Promise((resolve, reject) => {
+          uploadBytesResumable(storageRef, file).on('state_changed', null, reject, async () => {
+            attachmentURL = await getDownloadURL(storageRef);
+            attachmentName = file.name;
+            resolve();
+          });
+        });
+      }
+
+      await addDoc(collection(db, 'discussion-topics'), {
+        title, body, tags,
+        authorEmail: currentUser.email,
+        authorUid: currentUser.uid,
+        replyCount: 0,
+        attachmentURL, attachmentName,
+        createdAt: serverTimestamp()
+      });
+
+      // Reset form
+      document.getElementById('disc-topic-title').value = '';
+      document.getElementById('disc-topic-body').value = '';
+      document.getElementById('disc-topic-file').value = '';
+      document.getElementById('disc-topic-file-selected').textContent = '';
+      ['general','board','fc','gpc'].forEach(tag => {
+        document.getElementById('disc-tag-' + tag).checked = tag === 'general';
+      });
+      progressEl.style.display = 'none';
+      document.getElementById('disc-new-topic-form').style.display = 'none';
+      document.getElementById('disc-list-view').style.display = 'block';
+      loadDiscussionTopics('all', 'all');
+    } catch(e) { console.error(e); progressEl.textContent = 'Error posting. Please try again.'; }
+  });
+
+  // Post reply
+  document.getElementById('disc-post-reply-btn').addEventListener('click', async () => {
+    const body = document.getElementById('disc-reply-body').value.trim();
+    if (!body) { alert('Please write a reply.'); return; }
+    if (!currentTopicId) return;
+
+    const progressEl = document.getElementById('disc-reply-progress');
+    progressEl.style.display = 'block';
+
+    try {
+      let attachmentURL = null, attachmentName = null;
+      const file = document.getElementById('disc-reply-file').files[0];
+      if (file) {
+        const storageRef = ref(storage, `discussion/replies/${currentTopicId}/${Date.now()}_${file.name}`);
+        await new Promise((resolve, reject) => {
+          uploadBytesResumable(storageRef, file).on('state_changed', null, reject, async () => {
+            attachmentURL = await getDownloadURL(storageRef);
+            attachmentName = file.name;
+            resolve();
+          });
+        });
+      }
+
+      const { increment } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js");
+      await addDoc(collection(db, 'discussion-replies'), {
+        topicId: currentTopicId,
+        body, attachmentURL, attachmentName,
+        authorEmail: currentUser.email,
+        authorUid: currentUser.uid,
+        createdAt: serverTimestamp()
+      });
+      await updateDoc(doc(db, 'discussion-topics', currentTopicId), { replyCount: increment(1) });
+
+      document.getElementById('disc-reply-body').value = '';
+      document.getElementById('disc-reply-file').value = '';
+      document.getElementById('disc-reply-file-selected').textContent = '';
+      progressEl.style.display = 'none';
+      loadReplies(currentTopicId);
+    } catch(e) { console.error(e); progressEl.textContent = 'Error posting reply.'; }
+  });
+
+  // Load discussion on app start
+  loadDiscussionTopics('all', 'all');
+
+
