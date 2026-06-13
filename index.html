@@ -843,6 +843,7 @@
       loadMeetings('board');
       loadMeetings('fc');
       loadMeetings('gpc');
+      loadDiscussionTopics('all', 'all');
     } else {
       currentUser = null;
       currentUserData = null;
@@ -1654,10 +1655,6 @@
     currentTopicId = null;
   });
 
-  // Setup dropzones for discussion
-  setupDropzone('disc-topic-dropzone', 'disc-topic-file', 'disc-topic-file-selected');
-  setupDropzone('disc-reply-dropzone', 'disc-reply-file', 'disc-reply-file-selected');
-
   // Discussion filter buttons
   document.querySelectorAll('[data-disc-filter]').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -1953,7 +1950,11 @@
     } catch(e) { console.error(e); progressEl.textContent = 'Error posting reply.'; }
   });
 
-  // Load discussion on app start
-  loadDiscussionTopics('all', 'all');
+  // Setup dropzones for discussion — called here AFTER setupDropzone function is defined above
+  setupDropzone('disc-topic-dropzone', 'disc-topic-file', 'disc-topic-file-selected');
+  setupDropzone('disc-reply-dropzone', 'disc-reply-file', 'disc-reply-file-selected');
+
+  // Discussion loads when the user clicks the Discussion tab (see tab click handler above)
+  // It also loads after login via onAuthStateChanged → setupUI
 
 
